@@ -1,10 +1,7 @@
-var mymodule = require('./mymodule.js');
-var args = process.argv.slice(2);
-function callback(err, list) {
-    if (err) throw err;
-    list.forEach(function(item) {
-        console.log(item);
-    });
+var http = require('http');
+var url = process.argv[2];
+function callback(response) {
+    response.setEncoding('utf8');
+    response.on("data", console.log);
 }
-
-mymodule(args[0], args[1], callback);
+http.get(url, callback);
