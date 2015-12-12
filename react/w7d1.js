@@ -30,9 +30,10 @@ function RenderButton() {
 	);
 }
 
+var a = { count: 0 };
 var ClickCounter = React.createClass({
 	getInitialState: function() {
-		return {count: 0};
+		return a;
 	},
 	click: function(event) {
 		event.preventDefault();
