@@ -24,18 +24,9 @@ var partOne = function() {
     var signal = eq_sides[0].trim();
     var gate = eq_sides[1].trim();
 
-    var method = assign;
-    if (search(signal, lshift)) {
-      method = lshift;
-    } else if (search(signal, rshift)) {
-      method = rshift;
-    } else if (search(signal, and)) {
-      method = and;
-    } else if (search(signal, or)) {
-      method = or;
-    } else if (search(signal, not)) {
-      method = not;
-    }
+    gates[gate] = signal;
+    return;
+
 
     var signal_flow, input_value_1, input_value_2;
     switch (method) {
@@ -80,10 +71,42 @@ var partOne = function() {
         break;
     }
   });
+  var findValue = function(gates, gate) {
+    var running_total;
+    if (parseInt(gates[gate])) {
+      return parseInt(gates[gate]);
+    }
+    if (gates[gate] !== undefined) {
+      running_total = gates[gate];
+    }
+  };
   rl_stream.on('close', function() {
-    console.log(gates);
-    console.log(gates.lx);
-    console.log(gates.a);
+    var running_total;
+    if (gates[gates.a] !== undefined) {
+      running_total = gates[gates.a];
+    }
+    var method;
+    while (isNaN(parseInt(running_total))) {
+      console.log(running_total);
+      if (search(running_total, lshift)) {
+        method = lshift;
+      } else if (search(running_total, rshift)) {
+        method = rshift;
+      } else if (search(running_total, and)) {
+        method = and;
+      } else if (search(running_total, or)) {
+        method = or;
+      } else if (search(running_total, not)) {
+        method = not;
+      }
+    }
+    console.log(running_total);
+    //console.log(gates.a);
+    //console.log(gates.lx);
+    //console.log(gates.lw);
+    //console.log(gates.lc);
+    //console.log(gates.lv);
+    //console.log(gates.lu);
   });
 };
 partOne();
