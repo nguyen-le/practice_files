@@ -1,5 +1,6 @@
-var fs = require('fs');
-var rl = require('readline');
+/* jshint esnext: true */
+const fs = require('fs');
+const rl = require('readline');
 
 var lshift = 'LSHIFT',
     rshift = 'RSHIFT',
@@ -71,42 +72,103 @@ var partOne = function() {
         break;
     }
   });
-  var findValue = function(gates, gate) {
+
+  // a: x AND y
+  // a: x OR y
+  // a: x LSHIFT 2
+  // a: x RSHIFT 2
+  // a: NOT x
+  // a: 123
+  var findValue = function(gate) {
+    console.log();
+    console.log('find_value start');
     var running_total;
-    if (parseInt(gates[gate])) {
-      return parseInt(gates[gate]);
-    }
-    if (gates[gate] !== undefined) {
-      running_total = gates[gate];
-    }
-  };
-  rl_stream.on('close', function() {
-    var running_total;
-    if (gates[gates.a] !== undefined) {
-      running_total = gates[gates.a];
-    }
-    var method;
-    while (isNaN(parseInt(running_total))) {
-      console.log(running_total);
-      if (search(running_total, lshift)) {
-        method = lshift;
-      } else if (search(running_total, rshift)) {
-        method = rshift;
-      } else if (search(running_total, and)) {
-        method = and;
-      } else if (search(running_total, or)) {
-        method = or;
-      } else if (search(running_total, not)) {
-        method = not;
+    var gate_value = gates[gate];
+    console.log('gate: ' + gate + '; ' + 'value: ' + gates[gate]);
+    console.log(gate);
+    if (!isNaN(gate)) {
+      running_total = parseInt(gate);
+      return running_total;
+    } else if (gate_value.toString().search(/[a-z]/i) == -1) {
+      console.log('found a number');
+      console.log(gate_value);
+      running_total = parseInt(gate_value);
+    } else {
+      var logical_flow = gate_value.split(' ');
+      if (logical_flow.length === 1) {
+        console.log('variable gate');
+        running_total = findValue(logical_flow[0]);
+      } else if (logical_flow.length === 2) {
+        // NOT
+        console.log(not);
+        var independent_gate = logical_flow[1];
+        running_total = findValue(independent_gate) ^ 65535;
+      } else if (logical_flow.length === 3) {
+        // AND, OR, LSHIFT, RSHIFT
+        console.log('length 3');
+        var independent_gate_1 = logical_flow[0];
+        var independent_gate_2 = logical_flow[2];
+        switch (logical_flow[1]) {
+          case and:
+            console.log(and);
+            console.log(independent_gate_1);
+            console.log(independent_gate_2);
+            running_total = findValue(independent_gate_1) & findValue(independent_gate_2);
+            break;
+          case or:
+            console.log(or);
+            running_total = findValue(independent_gate_1) | findValue(independent_gate_2);
+            break;
+          case lshift:
+            console.log(lshift);
+            running_total = findValue(independent_gate_1) << independent_gate_2;
+            if (running_total > 65535) {
+              running_total = parseInt(running_total.toString(2).slice(-16), 2);
+            }
+            break;
+          case rshift:
+            console.log(rshift);
+            running_total = findValue(independent_gate_1) >> independent_gate_2;
+            if (running_total < 0) {
+              running_total = 0;
+            }
+            break;
+        }
       }
     }
-    console.log(running_total);
+    gates[gate] = running_total;
+    return running_total;
+  };
+
+  rl_stream.on('close', function() {
     //console.log(gates.a);
     //console.log(gates.lx);
     //console.log(gates.lw);
     //console.log(gates.lc);
     //console.log(gates.lv);
     //console.log(gates.lu);
+    //console.log(gates.lr);
+    //console.log(gates.lt);
+    //console.log(gates.ls);
+    //console.log(gates.lf);
+    //console.log(gates.ld);
+    //console.log(gates.le);
+    //console.log(gates.lq);
+    var original_gates = Object.assign({}, gates);
+    //console.log(findValue('a'));
+    var a_vale = findValue('a');
+    Object.assign(gates, original_gates);
+    gates.b = a_vale;
+    console.log('a value: ' + findValue('a'));
+    //var gatess = {};
+    //keys = Object.keys(gates),
+    //len = keys.length;
+    //keys.sort();
+    //for (var i = 0; i < len; i++) {
+      //gatess[keys[i]] = gates[keys[i]];
+    //}
+    //console.log(gatess);
+    //console.log(gates);
   });
 };
 partOne();
